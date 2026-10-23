@@ -3,244 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediaConvert Pro - All-in-One Online Media Suite</title>
+  <title>MediaConvert Pro - Ultimate Studio Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white">
 
   <!-- Header Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50" x-data>
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2 font-bold text-xl text-indigo-400 cursor-pointer" @click="$dispatch('switch-tab', 'crop')">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        <span>MediaConvert Pro</span>
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3 font-bold text-xl text-indigo-400">
+        <div class="w-9 h-9 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span>MediaConvert <span class="text-white">Pro Studio</span></span>
       </div>
-      
-      <span class="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full">Client & API Powered</span>
+      <span class="text-xs bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-3 py-1.5 rounded-full font-medium">Client-Side Engine</span>
     </div>
   </header>
 
-  <!-- Main Application Engine -->
-  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full" x-data="converterApp()" @switch-tab.window="setActiveTab($event.detail)">
-    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl">
+  <!-- Main Application Workspace -->
+  <main class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full" x-data="studioApp()">
+    <div class="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-2xl space-y-6">
       
-      <!-- Top Tool Switcher Tabs -->
-      <div class="flex flex-wrap gap-2 mb-8 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700/50 justify-center">
-        <button @click="setActiveTab('youtube')" :class="currentTab === 'youtube' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all">
-          YouTube Downloader
-        </button>
-        <button @click="setActiveTab('crop')" :class="currentTab === 'crop' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all">
-          Image Cropper
-        </button>
-        <button @click="setActiveTab('resize')" :class="currentTab === 'resize' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all">
-          Image Resizer
-        </button>
-        <button @click="setActiveTab('convert')" :class="currentTab === 'convert' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all">
-          Format Converter
-        </button>
+      <!-- Top Tool Switcher -->
+      <div class="flex gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800/80 max-w-md mx-auto justify-center">
+        <button @click="currentTab = 'crop'; resetEditorState()" :class="currentTab === 'crop' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:text-white'" class="flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all">Crop Studio</button>
+        <button @click="currentTab = 'resize'; resetEditorState()" :class="currentTab === 'resize' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:text-white'" class="flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all">Resize Studio</button>
       </div>
 
-      <!-- TAB 1: YOUTUBE DOWNLOADER -->
-      <div x-show="currentTab === 'youtube'" class="space-y-6">
-        <div class="text-center space-y-2">
-          <h2 class="text-2xl font-bold text-white">YouTube Video Downloader</h2>
-          <p class="text-slate-400 text-sm">Paste any YouTube video URL below to generate direct download links.</p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-3">
-          <input type="url" x-model="ytUrl" placeholder="https://www.youtube.com/watch?v=..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
-          <button @click="fetchYouTubeMedia()" :disabled="isYtLoading" class="py-3 px-6 bg-red-600 hover:bg-red-500 disabled:bg-slate-700 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2">
-            <span x-show="!isYtLoading">Fetch Download</span>
-            <span x-show="isYtLoading" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-          </button>
-        </div>
-
-        <div x-show="ytError" class="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm rounded-xl text-center" x-text="ytError"></div>
-
-        <template x-if="ytData">
-          <div class="bg-slate-900/80 rounded-xl p-5 border border-slate-700/50 space-y-4">
-            <div class="flex items-center gap-4">
-              <img :src="ytData.thumbnail" class="w-28 h-20 object-cover rounded-lg border border-slate-700">
-              <div>
-                <h3 class="font-semibold text-white text-sm line-clamp-2" x-text="ytData.title"></h3>
-                <p class="text-xs text-slate-400 mt-1" x-text="'Status: ' + ytData.duration"></p>
-              </div>
-            </div>
-
-            <div class="border-t border-slate-800 pt-3 space-y-2">
-              <p class="text-xs font-semibold text-slate-300">Available Download Link:</p>
-              <div class="space-y-2">
-                <template x-for="link in ytData.links" :key="link.url">
-                  <a :href="link.url" target="_blank" download class="flex items-center justify-between p-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs sm:text-sm text-white font-medium transition shadow">
-                    <span x-text="link.quality + ' - Click to Save Video'"></span>
-                    <span>&darr; Download</span>
-                  </a>
-                </template>
-              </div>
-            </div>
+      <!-- STEP 1: UPLOAD SCREEN -->
+      <div x-show="step === 'upload'" class="py-16">
+        <div 
+          @dragover.prevent="isDragging = true" 
+          @dragleave.prevent="isDragging = false" 
+          @drop.prevent="handleDrop($event)"
+          :class="isDragging ? 'border-indigo-500 bg-indigo-500/10 scale-[1.01]' : 'border-slate-800 hover:border-slate-700 bg-slate-900/60'"
+          class="border-2 border-dashed rounded-3xl p-14 text-center transition-all cursor-pointer max-w-xl mx-auto group shadow-inner"
+          @click="$refs.fileInput.click()"
+        >
+          <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" accept="image/*" class="hidden">
+          <div class="w-16 h-16 bg-slate-800 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </div>
-        </template>
+          <p class="text-base font-bold text-white">Click or Drop your Image here</p>
+          <p class="text-xs text-slate-400 mt-1.5">Supports PNG, JPEG, WEBP up to high resolutions</p>
+        </div>
       </div>
 
-      <!-- TAB 2, 3, 4: LOCAL MEDIA TOOLS -->
-      <div x-show="currentTab !== 'youtube'">
+      <!-- STEP 2: STUDIO WORKSPACE -->
+      <div x-show="step === 'editor'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
-        <!-- Step 1: Upload File -->
-        <div x-show="step === 'upload'" class="space-y-6">
-          <div class="text-center space-y-2">
-            <h2 class="text-2xl font-bold text-white" x-text="getTabTitle()"></h2>
-            <p class="text-slate-400 text-sm">Processed locally on your device. Zero cloud uploads.</p>
+        <!-- Center Image Viewport -->
+        <div class="lg:col-span-2 bg-slate-950/80 p-6 rounded-2xl border border-slate-800/80 flex flex-col items-center justify-center min-h-[480px] relative overflow-hidden shadow-inner">
+          <div class="absolute top-4 left-4 text-xs font-mono text-slate-400 bg-slate-900/90 px-3 py-1 rounded-lg border border-slate-800">
+            Original: <span class="text-indigo-400" x-text="imgWidth + ' x ' + imgHeight + 'px'"></span>
           </div>
-
-          <div 
-            @dragover.prevent="isDragging = true" 
-            @dragleave.prevent="isDragging = false" 
-            @drop.prevent="handleDrop($event)"
-            :class="isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 hover:border-slate-600 bg-slate-900/40'"
-            class="border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer"
-            @click="$refs.fileInput.click()"
-          >
-            <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" class="hidden">
-            <svg class="w-12 h-12 mx-auto text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <p class="text-sm font-medium text-slate-200">Click or Drag & Drop File Here</p>
-            <p class="text-xs text-slate-500 mt-1">Supports PNG, JPG, WEBP, GIF</p>
+          
+          <div class="relative overflow-auto max-h-[450px] max-w-full flex items-center justify-center p-2">
+            <img x-ref="sourceImage" :src="previewUrl" :style="`filter: brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%);`" class="max-h-[420px] object-contain rounded-lg shadow-2xl transition-all" @load="initDimensions()">
           </div>
         </div>
 
-        <!-- Step 2: Settings and Preview -->
-        <div x-show="step === 'process'" class="space-y-6">
-          <div class="flex items-center justify-between">
-            <button @click="resetLocal()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-              &larr; Choose Different File
-            </button>
-            <span class="text-xs font-mono text-indigo-400" x-text="selectedFile?.name"></span>
-          </div>
+        <!-- Right Sidebar Control Deck -->
+        <div class="bg-slate-900/80 p-6 rounded-2xl border border-slate-800/80 flex flex-col justify-between space-y-6 shadow-xl">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 class="font-bold text-white text-xs uppercase tracking-widest text-indigo-400" x-text="currentTab + ' Properties'"></h3>
+              <button @click="step = 'upload'" class="text-xs text-slate-400 hover:text-white transition">Change Image</button>
+            </div>
 
-          <div x-show="previewUrl" class="flex justify-center bg-slate-950 p-4 rounded-xl border border-slate-700/50 max-h-[350px] overflow-hidden items-center">
-            <img x-ref="imagePreview" :src="previewUrl" class="max-h-[320px] object-contain rounded-lg">
-          </div>
-
-          <!-- Controls -->
-          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/50 space-y-4">
+            <!-- CROP CONTROLS -->
             <template x-if="currentTab === 'crop'">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="text-xs text-slate-400 block mb-1">Aspect Ratio</label>
-                  <select x-model="cropRatio" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-                    <option value="1">1:1 (Square)</option>
-                    <option value="1.77777777778">16:9 (Landscape)</option>
-                    <option value="0.75">3:4 (Portrait)</option>
-                    <option value="free">Free / Center Crop</option>
-                  </select>
+              <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Crop Width (px)</label>
+                    <input type="number" x-model.number="cropW" @input="updateAspectCrop('w')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Crop Height (px)</label>
+                    <input type="number" x-model.number="cropH" @input="updateAspectCrop('h')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
                 </div>
-                <div>
-                  <label class="text-xs text-slate-400 block mb-1">Export Format</label>
-                  <select x-model="outputFormat" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-                    <option value="image/png">PNG (.png)</option>
-                    <option value="image/jpeg">JPG (.jpg)</option>
-                    <option value="image/webp">WEBP (.webp)</option>
-                  </select>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Offset X</label>
+                    <input type="number" x-model.number="cropX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Offset Y</label>
+                    <input type="number" x-model.number="cropY" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                  <input type="checkbox" x-model="lockAspect" id="lock" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0">
+                  <label for="lock" class="text-slate-300 cursor-pointer select-none">Lock Aspect Ratio</label>
                 </div>
               </div>
             </template>
 
+            <!-- RESIZE CONTROLS -->
             <template x-if="currentTab === 'resize'">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="text-xs text-slate-400 block mb-1">Target Width (Pixels)</label>
-                  <input type="number" x-model.number="resizeWidth" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+              <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Target Width</label>
+                    <input type="number" x-model.number="resizeW" @input="resizeH = lockAspect ? Math.round(resizeW / originalRatio) : resizeH" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block mb-1 font-medium">Target Height</label>
+                    <input type="number" x-model.number="resizeH" @input="resizeW = lockAspect ? Math.round(resizeH * originalRatio) : resizeW" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none">
+                  </div>
                 </div>
-                <div>
-                  <label class="text-xs text-slate-400 block mb-1">Export Format</label>
-                  <select x-model="outputFormat" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-                    <option value="image/png">PNG (.png)</option>
-                    <option value="image/jpeg">JPG (.jpg)</option>
-                    <option value="image/webp">WEBP (.webp)</option>
-                  </select>
+
+                <div class="flex items-center gap-2 pt-1">
+                  <input type="checkbox" x-model="lockAspect" id="lockResize" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0">
+                  <label for="lockResize" class="text-slate-300 cursor-pointer select-none">Constrain Proportions</label>
                 </div>
               </div>
             </template>
 
-            <template x-if="currentTab === 'convert'">
-              <div>
-                <label class="text-xs text-slate-400 block mb-1">Target Format</label>
-                <select x-model="outputFormat" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-                  <option value="image/png">Convert to PNG (.png)</option>
-                  <option value="image/jpeg">Convert to JPG (.jpg)</option>
-                  <option value="image/webp">Convert to WEBP (.webp)</option>
-                </select>
+            <!-- PHOTOSHOP-STYLE FILTERS -->
+            <div class="pt-4 border-t border-slate-800 space-y-3 text-xs">
+              <span class="font-medium text-slate-400 block">Pro Image Filters</span>
+              
+              <div class="space-y-1">
+                <div class="flex justify-between text-slate-400"><span>Brightness</span><span x-text="brightness + '%'"></span></div>
+                <input type="range" min="50" max="150" x-model.number="brightness" class="w-full accent-indigo-500 bg-slate-950 rounded cursor-pointer">
               </div>
-            </template>
+
+              <div class="space-y-1">
+                <div class="flex justify-between text-slate-400"><span>Contrast</span><span x-text="contrast + '%'"></span></div>
+                <input type="range" min="50" max="150" x-model.number="contrast" class="w-full accent-indigo-500 bg-slate-950 rounded cursor-pointer">
+              </div>
+            </div>
+
+            <!-- Export Config -->
+            <div class="pt-4 border-t border-slate-800 space-y-2 text-xs">
+              <label class="text-slate-400 block font-medium">Export Format & Quality</label>
+              <select x-model="outputFormat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none">
+                <option value="image/png">PNG (.png - Lossless)</option>
+                <option value="image/jpeg">JPEG (.jpg - Standard)</option>
+                <option value="image/webp">WEBP (.webp - Optimized)</option>
+              </select>
+            </div>
           </div>
 
-          <button @click="processFile()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all shadow-lg shadow-indigo-600/20">
-            Process & Export File
+          <button @click="processAndExport()" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-2xl transition shadow-xl shadow-indigo-600/20 text-sm tracking-wide">
+            Process & Export Image
           </button>
         </div>
 
-        <!-- Step 3: Result -->
-        <div x-show="step === 'result'" class="text-center space-y-6 py-4">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          </div>
-          <div>
-            <h3 class="text-2xl font-bold text-white">Processing Complete!</h3>
-            <p class="text-slate-400 text-sm mt-1">Your output file is generated and ready to save.</p>
-          </div>
+      </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto">
-            <a :href="downloadUrl" :download="downloadFilename" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Download Result
-            </a>
-            <button @click="resetLocal()" class="py-3 px-6 bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium rounded-xl transition-all">
-              Start New
-            </button>
-          </div>
+      <!-- STEP 3: RESULT SCREEN -->
+      <div x-show="step === 'result'" class="text-center space-y-6 py-12">
+        <div class="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20 shadow-lg">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-2xl font-bold text-white">Masterpiece Rendered!</h3>
+          <p class="text-slate-400 text-sm">Your customized image is generated and ready for download.</p>
         </div>
 
+        <div class="flex gap-3 justify-center max-w-sm mx-auto pt-2">
+          <a :href="downloadUrl" :download="downloadFilename" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2 text-sm">
+            Save Result
+          </a>
+          <button @click="step = 'editor'" class="py-3.5 px-6 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition text-sm">
+            Edit More
+          </button>
+        </div>
       </div>
 
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-800 text-center py-6 text-xs text-slate-500">
-    &copy; 2026 MediaConvert Pro. All rights reserved.
+  <footer class="border-t border-slate-800/80 text-center py-6 text-xs text-slate-500">
+    &copy; 2026 MediaConvert Pro Studio. All rights reserved.
   </footer>
 
-  <!-- Application Logic -->
+  <!-- Studio Script Engine -->
   <script>
-    function converterApp() {
+    function studioApp() {
       return {
-        currentTab: 'youtube',
+        currentTab: 'crop',
         step: 'upload',
         isDragging: false,
-        selectedFile: null,
         previewUrl: null,
         downloadUrl: null,
-        downloadFilename: 'output.png',
-        cropRatio: 'free',
+        downloadFilename: 'studio-edit.png',
         outputFormat: 'image/png',
-        resizeWidth: 800,
+        
+        imgWidth: 0,
+        imgHeight: 0,
+        originalRatio: 1,
+        lockAspect: true,
 
-        ytUrl: '',
-        isYtLoading: false,
-        ytError: null,
-        ytData: null,
+        // Crop properties
+        cropW: 0,
+        cropH: 0,
+        cropX: 0,
+        cropY: 0,
 
-        setActiveTab(tab) {
-          this.currentTab = tab;
-          this.resetLocal();
-        },
+        // Resize properties
+        resizeW: 0,
+        resizeH: 0,
 
-        getTabTitle() {
-          if (this.currentTab === 'crop') return 'Image Cropper';
-          if (this.currentTab === 'resize') return 'Image Resizer';
-          if (this.currentTab === 'convert') return 'Format Converter';
-          return 'Media Tool';
-        },
+        // Filter properties
+        brightness: 100,
+        contrast: 100,
+        grayscale: 0,
 
         handleFileSelect(e) {
           const file = e.target.files[0];
@@ -254,113 +230,71 @@
         },
 
         loadFile(file) {
-          this.selectedFile = file;
-          this.previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
-          this.step = 'process';
+          this.previewUrl = URL.createObjectURL(file);
+          this.step = 'editor';
         },
 
-        processFile() {
-          if (!this.selectedFile) return;
+        initDimensions() {
+          const img = this.$refs.sourceImage;
+          this.imgWidth = img.naturalWidth;
+          this.imgHeight = img.naturalHeight;
+          this.originalRatio = this.imgWidth / this.imgHeight;
 
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+          this.cropW = this.imgWidth;
+          this.cropH = this.imgHeight;
+          this.cropX = 0;
+          this.cropY = 0;
 
-            let srcWidth = img.width;
-            let srcHeight = img.height;
-            let destWidth = srcWidth;
-            let destHeight = srcHeight;
-            let startX = 0;
-            let startY = 0;
+          this.resizeW = this.imgWidth;
+          this.resizeH = this.imgHeight;
 
-            if (this.currentTab === 'crop' && this.cropRatio !== 'free') {
-              const targetRatio = parseFloat(this.cropRatio);
-              const currentRatio = srcWidth / srcHeight;
-
-              if (currentRatio > targetRatio) {
-                destWidth = srcHeight * targetRatio;
-                startX = (srcWidth - destWidth) / 2;
-              } else {
-                destHeight = srcWidth / targetRatio;
-                startY = (srcHeight - destHeight) / 2;
-              }
-            } else if (this.currentTab === 'resize' && this.resizeWidth > 0) {
-              const ratio = this.resizeWidth / srcWidth;
-              destWidth = this.resizeWidth;
-              destHeight = srcHeight * ratio;
-            }
-
-            canvas.width = destWidth;
-            canvas.height = destHeight;
-            ctx.drawImage(img, startX, startY, destWidth, destHeight, 0, 0, destWidth, destHeight);
-
-            let ext = 'png';
-            if (this.outputFormat === 'image/jpeg') ext = 'jpg';
-            if (this.outputFormat === 'image/webp') ext = 'webp';
-
-            this.downloadFilename = `converted-${Date.now()}.${ext}`;
-
-            canvas.toBlob((blob) => {
-              if (blob) {
-                this.downloadUrl = URL.createObjectURL(blob);
-                this.step = 'result';
-              }
-            }, this.outputFormat, 0.92);
-          };
-
-          img.src = this.previewUrl || URL.createObjectURL(this.selectedFile);
+          this.brightness = 100;
+          this.contrast = 100;
         },
 
-        async fetchYouTubeMedia() {
-          if (!this.ytUrl) {
-            this.ytError = 'Please paste a YouTube URL first.';
-            return;
-          }
-
-          this.isYtLoading = true;
-          this.ytError = null;
-          this.ytData = null;
-
-          try {
-            const res = await fetch('https://co.wuk.sh/api/json', {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                url: this.ytUrl,
-                vQuality: '720'
-              })
-            });
-
-            const data = await res.json();
-
-            if (data && data.url) {
-              this.ytData = {
-                title: 'YouTube Video Stream',
-                duration: 'Ready to Download',
-                thumbnail: 'https://img.youtube.com/vi/' + (this.ytUrl.split('v=')[1]?.split('&')[0] || 'default') + '/hqdefault.jpg',
-                links: [
-                  { quality: 'HD Video (.mp4)', url: data.url }
-                ]
-              };
-            } else {
-              throw new Error('Could not fetch download links. Please check the URL.');
-            }
-          } catch (err) {
-            this.ytError = 'Network or CORS block detected. Try disabling ad-blockers or use another link.';
-          } finally {
-            this.isYtLoading = false;
+        updateAspectCrop(changed) {
+          if (!this.lockAspect) return;
+          if (changed === 'w') {
+            this.cropH = Math.round(this.cropW / this.originalRatio);
+          } else {
+            this.cropW = Math.round(this.cropH * this.originalRatio);
           }
         },
 
-        resetLocal() {
-          this.step = 'upload';
-          this.selectedFile = null;
-          this.previewUrl = null;
-          this.downloadUrl = null;
+        processAndExport() {
+          const img = this.$refs.sourceImage;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          // Apply filters during canvas draw
+          ctx.filter = `brightness(${this.brightness}%) contrast(${this.contrast}%) grayscale(${this.grayscale}%)`;
+
+          if (this.currentTab === 'crop') {
+            canvas.width = this.cropW;
+            canvas.height = this.cropH;
+            ctx.drawImage(img, this.cropX, this.cropY, this.cropW, this.cropH, 0, 0, this.cropW, this.cropH);
+          } else {
+            canvas.width = this.resizeW;
+            canvas.height = this.resizeH;
+            ctx.drawImage(img, 0, 0, this.resizeW, this.resizeH);
+          }
+
+          let ext = 'png';
+          if (this.outputFormat === 'image/jpeg') ext = 'jpg';
+          if (this.outputFormat === 'image/webp') ext = 'webp';
+
+          this.downloadFilename = `studio-output-${Date.now()}.${ext}`;
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              this.downloadUrl = URL.createObjectURL(blob);
+              this.step = 'result';
+            }
+          }, this.outputFormat, 0.95);
+        },
+
+        resetEditorState() {
+          if (this.previewUrl) this.initDimensions();
         }
       }
     }
