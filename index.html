@@ -323,7 +323,7 @@
           this.ytData = null;
 
           try {
-            const res = await fetch('https://api.cobalt.tools/api/json', {
+            const res = await fetch('https://co.wuk.sh/api/json', {
               method: 'POST',
               headers: {
                 'Accept': 'application/json',
@@ -331,26 +331,26 @@
               },
               body: JSON.stringify({
                 url: this.ytUrl,
-                videoQuality: '720'
+                vQuality: '720'
               })
             });
 
             const data = await res.json();
 
-            if (data.status === 'stream' || data.status === 'redirect') {
+            if (data && data.url) {
               this.ytData = {
                 title: 'YouTube Video Stream',
                 duration: 'Ready to Download',
                 thumbnail: 'https://img.youtube.com/vi/' + (this.ytUrl.split('v=')[1]?.split('&')[0] || 'default') + '/hqdefault.jpg',
                 links: [
-                  { quality: 'HD Video', url: data.url }
+                  { quality: 'HD Video (.mp4)', url: data.url }
                 ]
               };
             } else {
-              throw new Error(data.text || 'Unable to fetch video links. Try a different URL.');
+              throw new Error('Could not fetch download links. Please check the URL.');
             }
           } catch (err) {
-            this.ytError = err.message || 'Error connecting to downloader service. Try again.';
+            this.ytError = 'Network or CORS block detected. Try disabling ad-blockers or use another link.';
           } finally {
             this.isYtLoading = false;
           }
